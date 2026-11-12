@@ -148,8 +148,12 @@ html.is-loading .hc-enter, html.is-loading .hc-media, html.is-loading .hc-media 
   display: flex; flex-direction: column; align-items: center; justify-content: center;
   background: var(--p-bg); color: var(--p-ink);
   clip-path: inset(0 0 0 0); transition: clip-path 900ms var(--hc-io);
+  /* no celular, um toque na abertura rolava a página por trás dela (abria já no vídeo da Dra.) */
+  touch-action: none; overscroll-behavior: contain;
 }
-#intro.is-out { clip-path: inset(0 0 100% 0); }
+/* só em tela de toque: no desktop esconder a barra de rolagem deslocaria a página quando a abertura sobe */
+@media (pointer: coarse) { html.is-loading, html.is-loading body { overflow: hidden; } }
+#intro.is-out { clip-path: inset(0 0 100% 0); pointer-events: none; }
 #intro .i-mark { display: flex; flex-direction: column; align-items: center; transition: transform 800ms var(--hc-io), opacity 500ms ease; }
 #intro.is-out .i-mark { transform: translateY(-32px); opacity: 0; }
 #intro .i-logo { width: 72px; height: 72px; border-radius: 50%; opacity: 0; transform: scale(0.92); transition: opacity 700ms var(--hc-out), transform 900ms var(--hc-out); }

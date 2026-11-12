@@ -88,6 +88,12 @@ const year = new Date().getFullYear();
       // a cascata própria do hero assume; a entrada do kit fica desligada nesta visita
       html.classList.add('is-loading', 'has-intro');
       html.classList.remove('m-enter');
+      // a primeira visita começa sempre no topo: o navegador do celular restaurava a rolagem de uma visita
+      // anterior (ou de um toque durante a abertura) e a página abria já no vídeo da Dra. Paula
+      var deep = !!location.hash;
+      try { if (!deep && 'scrollRestoration' in history) history.scrollRestoration = 'manual'; } catch (e) {}
+      var toTop = function () { if (!deep) window.scrollTo(0, 0); };
+      toTop();
       var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
       var MIN = reduce ? 400 : 2100, MAX = 4000, start = Date.now(), finished = false;
       var wait = function (ms) { return new Promise(function (r) { setTimeout(r, ms); }); };
@@ -100,8 +106,10 @@ const year = new Date().getFullYear();
         setTimeout(function () {
           intro.classList.add('is-done');
           setTimeout(function () {
+            toTop();
             intro.classList.add('is-out');
             html.classList.remove('is-loading');
+            try { history.scrollRestoration = 'auto'; } catch (e) {}
             try { sessionStorage.setItem('dpm-intro', '1'); } catch (e) {}
             setTimeout(function () { intro.remove(); }, 1000);
           }, 340);

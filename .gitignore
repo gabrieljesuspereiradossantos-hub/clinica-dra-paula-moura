@@ -10,3 +10,5 @@ shots/
 video/node_modules/
 video/capture/
 video/**/renders/
+video/entregas/
+video/**/.hyperframes/

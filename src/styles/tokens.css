@@ -152,7 +152,19 @@
   .contact-grid .form { grid-template-columns: minmax(0, 1fr); }
 }
 
-/* ---------- celular: seções em telas inteiras */
+/* ---------- celular: cada seção do tamanho do próprio conteúdo
+   O kit dá a cada seção pelo menos 1 ou 2 telas inteiras (--h / --hm) e espalha o conteúdo para preencher.
+   No celular o conteúdo é mais curto que isso e sobravam de 300 a 580 px em branco no fim das seções.
+   Aqui a seção volta a ter a altura do conteúdo, com o respiro normal de cima e de baixo.
+   A seção do vídeo (.sxm) fica de fora: as 2 telas dela são a rolagem que faz o vídeo crescer.
+   Vale também para o tablet (até 1023 px), onde a sobra era ainda maior. */
+@media (max-width: 1023px) {
+  main > :is(section, .section):not(.hero, .section--hero, .sxm), footer.closing { min-height: 0; height: auto; }
+}
+@media (max-width: 639px) {
+  :where(main > :is(section, .section):not(.hero, .section--hero, .sxm):has(> :is(.wrap, .container)), footer.closing) { grid-template-rows: auto; }
+  main > :is(section, .section).g2m > :is(.wrap, .container), footer.closing.g2m > .wrap { grid-template-rows: auto auto; row-gap: var(--s-8); }
+}
 @media (max-width: 639px) {
   #sobre .frame--fit, #head-spa .frame--fit { --ratio: 110%; }
   #avaliacao .frame--video { --ratio: 150%; }
