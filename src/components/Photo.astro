@@ -1,0 +1,44 @@
+---
+/**
+ * Foto otimizada (AVIF/WebP, lazy) a partir de src/assets/fotos/<arquivo>.
+ * Sem arquivo definido em src/content/content.ts → espaço reservado com a marca.
+ */
+import { Picture } from 'astro:assets';
+import type { ImageMetadata } from 'astro';
+import { images } from '../content/content';
+import { reviewMode, site } from '../config/site';
+
+interface Props {
+  slot: keyof typeof images;
+  class?: string;
+  eager?: boolean;
+  sizes?: string;
+}
+
+const { slot, class: cls = 'frame__img', eager = false, sizes = '(min-width: 1024px) 50vw, 100vw' } = Astro.props;
+const meta = images[slot];
+const files = import.meta.glob<{ default: ImageMetadata }>('/src/assets/fotos/*.{jpg,jpeg,png,webp,avif}', { eager: true });
+const match = meta?.file ? files[`/src/assets/fotos/${meta.file}`] : undefined;
+if (meta?.file && !match) {
+  console.warn(`[Photo] Arquivo não encontrado: src/assets/fotos/${meta.file} (slot "${String(slot)}"). Mostrando o espaço reservado.`);
+}
+---
+{match ? (
+  <Picture
+    src={match.default}
+    alt={meta.alt}
+    formats={['avif', 'webp']}
+    widths={[480, 800, 1200, 1600]}
+    sizes={sizes}
+    pictureAttributes={cls ? { class: cls } : undefined}
+    loading={eager ? 'eager' : 'lazy'}
+    fetchpriority={eager ? 'high' : 'auto'}
+    style={meta.position ? `object-position: ${meta.position}` : undefined}
+    data-source="client"
+  />
+) : (
+  <div class={`${cls} slot`} aria-hidden="true" data-slot={String(slot)}>
+    <img class="slot__mark" src={site.logo.small} alt="" width="150" height="150" loading="lazy" decoding="async" />
+    {reviewMode && <span class="slot__label">Foto a enviar: {meta.brief}</span>}
+  </div>
+)}

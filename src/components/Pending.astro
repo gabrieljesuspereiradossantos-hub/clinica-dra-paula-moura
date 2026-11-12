@@ -1,0 +1,7 @@
+---
+/** Etiqueta "A confirmar" — só aparece no modo de revisão. */
+import { reviewMode } from '../config/site';
+interface Props { show?: boolean; note?: string; }
+const { show = true, note } = Astro.props;
+---
+{reviewMode && show && <span class="pending" title={note}>A confirmar{note ? `: ${note}` : ''}</span>}

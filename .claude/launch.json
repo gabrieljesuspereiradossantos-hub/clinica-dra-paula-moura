@@ -1,0 +1,17 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "site-revisao",
+      "runtimeExecutable": "npx",
+      "runtimeArgs": ["astro", "preview", "--port", "4321"],
+      "port": 4321
+    },
+    {
+      "name": "site-publico",
+      "runtimeExecutable": "npx",
+      "runtimeArgs": ["astro", "preview", "--outDir", "dist-public", "--port", "4322"],
+      "port": 4322
+    }
+  ]
+}

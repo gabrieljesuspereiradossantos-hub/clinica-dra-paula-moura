@@ -1,0 +1,13 @@
+---
+import Base from '../layouts/Base.astro';
+import { links } from '../config/site';
+---
+<Base title="Página não encontrada · Dra. Paula Moura" description="Este endereço não existe no site da Clínica Estética Avançada Dra. Paula Moura." inner>
+  <section class="section" aria-labelledby="nf-h">
+    <div class="wrap stack-5 measure">
+      <h1 id="nf-h" style="font: var(--display-weight) var(--t-h2)/1.1 var(--font-display)">Página não encontrada</h1>
+      <p>O link pode ter mudado. Volte para a página inicial ou agende sua avaliação direto pela agenda online.</p>
+      <p><a class="link" href="/">Voltar para a página inicial</a> &nbsp; <a class="link" href={links.booking} target="_blank" rel="noopener">Abrir a agenda online</a></p>
+    </div>
+  </section>
+</Base>

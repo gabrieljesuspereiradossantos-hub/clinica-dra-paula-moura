@@ -1,0 +1,52 @@
+---
+/**
+ * POLÍTICA DE PRIVACIDADE — modelo inicial para VALIDAÇÃO JURÍDICA.
+ * Revisar com advogado(a) antes de publicar: controlador, contato do encarregado,
+ * prazos de guarda e serviços de terceiros efetivamente usados.
+ */
+import Base from '../layouts/Base.astro';
+import Pending from '../components/Pending.astro';
+import { site, links, reviewMode } from '../config/site';
+const a = site.address;
+const updated = 'novembro de 2026';
+---
+<Base title={`Política de privacidade · ${site.shortName}`} description="Como a Clínica Estética Avançada Dra. Paula Moura trata os dados pessoais enviados pelo site, conforme a LGPD." inner>
+  <section class="section legal" aria-labelledby="priv-h">
+    <div class="wrap">
+      <div class="measure stack-5 legal__body">
+        <h1 id="priv-h">Política de privacidade</h1>
+        {reviewMode && <p class="review-note"><Pending note="texto-modelo para validação jurídica antes da publicação" /></p>}
+        <p class="t-small muted">Atualizada em {updated}.</p>
+
+        <h2>Quem trata os dados</h2>
+        <p>{site.name}, {a.street}, {a.complement}, {a.district}, {a.city} – {a.state}, CEP {a.postalCode}. Contato: {site.contact.phoneDisplay}.</p>
+
+        <h2>Quais dados o site recebe</h2>
+        <p>O site não exige cadastro. Quando você usa o formulário de contato, informa nome, número de WhatsApp, área de interesse e, se quiser, uma mensagem. Pedimos que não envie informações de saúde detalhadas pelo formulário: elas são tratadas na avaliação presencial.</p>
+
+        <h2>Para que usamos</h2>
+        <p>Somente para responder ao seu pedido de contato e organizar o agendamento. A base legal é o seu consentimento (art. 7º, I, da LGPD), que você pode retirar a qualquer momento.</p>
+
+        <h2>Com quem compartilhamos</h2>
+        <p>Os links de agendamento, WhatsApp, Instagram e Google Maps levam a serviços de terceiros, com políticas próprias. Se o formulário estiver ligado a um serviço de envio, ele recebe os dados apenas para entregá-los à clínica. Não vendemos nem cedemos dados.</p>
+
+        <h2>Cookies e medição</h2>
+        <p>O site não usa cookies de publicidade nem ferramentas de medição. As fontes são carregadas do próprio site. Caso uma ferramenta de medição seja adicionada, esta política e o aviso de consentimento serão atualizados antes.</p>
+
+        <h2>Por quanto tempo guardamos</h2>
+        <p>Pelo tempo necessário para responder e agendar, e depois apenas o que a lei exigir.</p>
+
+        <h2>Seus direitos</h2>
+        <p>Você pode pedir acesso, correção, exclusão ou informação sobre o uso dos seus dados pelo telefone <a class="link" href={links.phone}>{site.contact.phoneDisplay}</a>. Também pode reclamar à Autoridade Nacional de Proteção de Dados (ANPD).</p>
+
+        <p><a class="link" href="/">Voltar para a página inicial</a></p>
+      </div>
+    </div>
+  </section>
+</Base>
+
+<style is:global>
+  .legal { height: auto !important; min-height: 100svh; }
+  .legal__body h1 { font: var(--display-weight) var(--t-h2)/1.1 var(--font-display); letter-spacing: var(--display-tracking); }
+  .legal__body h2 { font: var(--display-weight) var(--t-h3)/1.2 var(--font-display); margin-top: var(--s-6); }
+</style>

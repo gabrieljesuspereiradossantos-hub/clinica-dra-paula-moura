@@ -1,0 +1,83 @@
+---
+/**
+ * Pedido de contato.
+ * - Com site.form.endpoint (variável PUBLIC_FORM_ENDPOINT) → system.js envia por POST e mostra a confirmação
+ *   só depois da resposta 2xx do serviço.
+ * - Sem endpoint → o envio abre o WhatsApp com a mensagem montada; nada é gravado pelo site.
+ * Antispam: campo-isca `_gotcha` (oculto) + validação no envio.
+ */
+import { site, links } from '../config/site';
+import { contact } from '../content/content';
+const endpoint = site.form.endpoint;
+---
+<form
+  class="form"
+  id="contact-form"
+  aria-labelledby="form-h"
+  action={endpoint || links.whatsappBase}
+  method={endpoint ? 'post' : 'get'}
+  data-endpoint={endpoint}
+  data-wa={links.whatsappBase}
+  data-fix="Corrija {n} campo(s) destacado(s)."
+  data-sending="Enviando…"
+  data-sent="Seu pedido de contato foi enviado. A clínica retorna pelo WhatsApp informado."
+  data-failed="Não foi possível enviar agora. Seus dados continuam aqui; tente de novo ou fale pelo WhatsApp."
+  novalidate
+>
+  <div class="field field--full">
+    <label for="f-name">Nome</label>
+    <input id="f-name" name="nome" type="text" autocomplete="name" required maxlength="80" aria-describedby="f-name-err">
+    <p class="field__error" id="f-name-err" hidden>Escreva seu nome.</p>
+  </div>
+  <div class="field">
+    <label for="f-phone">WhatsApp com DDD</label>
+    <input id="f-phone" name="whatsapp" type="tel" autocomplete="tel-national" inputmode="tel" required pattern="[0-9\s\(\)\+\-]{10,20}" aria-describedby="f-phone-err">
+    <p class="field__error" id="f-phone-err" hidden>Escreva o número com DDD, por exemplo (11) 91234-5678.</p>
+  </div>
+  <div class="field">
+    <label for="f-interest">Interesse</label>
+    <select id="f-interest" name="interesse" required aria-describedby="f-interest-err">
+      <option value="">Escolha uma opção</option>
+      {contact.interests.map((i) => <option value={i}>{i}</option>)}
+    </select>
+    <p class="field__error" id="f-interest-err" hidden>Escolha uma área de interesse.</p>
+  </div>
+  <div class="hp" aria-hidden="true">
+    <label for="f-gotcha">Não preencha este campo</label>
+    <input id="f-gotcha" name="_gotcha" type="text" tabindex="-1" autocomplete="off">
+  </div>
+  <div class="field field--full field--check">
+    <input id="f-consent" name="consentimento" type="checkbox" value="sim" required aria-describedby="f-consent-err">
+    <label for="f-consent">Autorizo a clínica a usar meu nome e WhatsApp para responder a este contato, conforme a <a class="link" href="/privacidade/">Política de privacidade</a>.</label>
+    <p class="field__error" id="f-consent-err" hidden>Marque a autorização para que a clínica possa responder.</p>
+  </div>
+  <div class="btn-row"><button class="btn btn--primary" type="submit">Enviar pedido de contato</button></div>
+  <p class="form__status" role="status" data-form-status></p>
+</form>
+
+<script is:inline>
+  (() => {
+    const form = document.getElementById('contact-form');
+    if (!form || (form.dataset.endpoint || '').trim()) return; // com endpoint, system.js envia
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+      if (!form.checkValidity()) return; // system.js mostra os erros e foca o primeiro campo
+      const status = form.querySelector('[data-form-status]');
+      if (form.elements._gotcha.value) return; // isca preenchida: robô
+      const v = (n) => (form.elements[n].value || '').trim();
+      const text = [
+        `Olá! Meu nome é ${v('nome')}.`,
+        `Tenho interesse em: ${v('interesse')}.`,
+        `Meu WhatsApp: ${v('whatsapp')}`,
+      ].filter(Boolean).join('\n');
+      const url = `${form.dataset.wa}?text=${encodeURIComponent(text)}`;
+      const win = window.open(url, '_blank'); // sem 'noopener' aqui: com ele o retorno é sempre null
+      if (win) win.opener = null;
+      const msg = !win
+        ? 'O navegador bloqueou a nova aba. Toque em "Falar pelo WhatsApp" no topo da página.'
+        : 'Abrimos o WhatsApp com a sua mensagem pronta. Toque em enviar por lá para concluir.';
+      // depois do handler do system.js, que limpa a linha de status num envio válido
+      if (status) setTimeout(() => { status.textContent = msg; }, 0);
+    });
+  })();
+</script>

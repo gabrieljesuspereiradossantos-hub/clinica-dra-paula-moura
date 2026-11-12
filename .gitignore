@@ -1,0 +1,9 @@
+node_modules/
+dist/
+dist-public/
+.astro/
+.taste-skill/
+shots/
+.playwright-mcp/
+.vercel/
+.env*

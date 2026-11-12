@@ -1,0 +1,256 @@
+/* ==========================================================================
+   HERO DA PÁGINA INICIAL
+   Padrão Solenime (foto da recepção, véu da esquerda, título em três linhas
+   com itálico dourado, destaques) no formato da referência MotionSites
+   "Aesthetic Dental Clinic" (quadro de cantos arredondados, selo de
+   avaliações, botão em pílula, anotação sobre a foto).
+   Curvas do Solenime: --hc-out (saída) e --hc-io (entrada e saída).
+   ========================================================================== */
+:root {
+  --hc-out: cubic-bezier(0.23, 1, 0.32, 1);
+  --hc-io: cubic-bezier(0.77, 0, 0.175, 1);
+  --hc-cacau: 43 33 26;           /* #2b211a, a tinta da marca em RGB para o véu */
+  --hc-gold: var(--brand-gold);   /* #cc9e63: 6,8:1 sobre o cacau */
+  --hc-radius: 28px;
+  --hc-inset: 12px;
+}
+
+main > .hero.hero--clinic {
+  padding: calc(var(--nav) + var(--hc-inset)) var(--hc-inset) var(--hc-inset);
+  height: 100vh; height: 100svh;
+}
+.hc-frame {
+  position: relative; isolation: isolate; overflow: hidden;
+  height: 100%; border-radius: var(--hc-radius);
+  background: rgb(var(--hc-cacau));
+  display: flex; flex-direction: column; justify-content: flex-end;
+}
+
+/* a foto: ocupa a direita do quadro no desktop, o alto no celular */
+.hc-media { position: absolute; inset: 0 0 0 auto; width: 66%; z-index: -2; overflow: hidden; }
+.hc-media > picture, .hc-media > .slot { position: absolute; inset: 0; display: block; }
+.hc-media img { width: 100%; height: 100%; object-fit: cover; object-position: 50% 62%; }
+
+/* véu: da esquerda, sobre o lado do texto, e um pouco de baixo */
+.hc-veil {
+  position: absolute; inset: 0; z-index: -1; pointer-events: none;
+  background:
+    linear-gradient(90deg, rgb(var(--hc-cacau)) 0%, rgb(var(--hc-cacau)) 36%, rgb(var(--hc-cacau) / 0.72) 46%, rgb(var(--hc-cacau) / 0) 64%),
+    linear-gradient(to top, rgb(var(--hc-cacau) / 0.55) 0%, rgb(var(--hc-cacau) / 0) 34%);
+}
+
+/* conteúdo nas mesmas linhas do resto da página (x 80 e 1360 em 1440) */
+.hc-content.wrap { width: min(100% - 2 * (var(--gut) - var(--hc-inset)), 1280px); padding-block: var(--s-8) var(--s-8); }
+.hc-text { max-width: 620px; color: var(--p-inv-ink); }
+
+/* selo da nota do Google (sem rostos inventados: a marca no lugar dos avatares) */
+.hc-badge {
+  display: inline-flex; align-items: center; gap: var(--s-3);
+  padding: 6px 16px 6px 6px; min-height: 44px; border-radius: 999px;
+  background: rgb(255 255 255 / 0.08); border: 1px solid rgb(255 255 255 / 0.18);
+  color: var(--p-inv-ink); text-decoration: none; font-size: var(--t-small);
+}
+.hc-badge img { width: 32px; height: 32px; border-radius: 50%; }
+.hc-badge__score { font-weight: 500; }
+.hc-stars { color: var(--hc-gold); letter-spacing: 1px; margin-left: 2px; }
+.hc-badge__meta { color: var(--p-inv-muted); }
+
+/* título: três linhas fixas, a do meio em itálico dourado */
+.hc-title {
+  margin-top: var(--s-6);
+  font: var(--display-weight) clamp(44px, 5.6vw, 88px) / 1 var(--font-display);
+  letter-spacing: var(--display-tracking-xl); color: var(--p-inv-ink); text-wrap: balance;
+}
+.hc-title > * { display: block; }
+.hc-title__em { font-style: italic; color: var(--hc-gold); }
+.hc-lead { margin-top: var(--s-5); max-width: 34rem; color: color-mix(in oklab, var(--p-inv-ink) 88%, transparent); font-size: var(--t-lead); line-height: 1.55; }
+.hc-text .btn-row { margin-top: var(--s-6); }
+.hc-text .btn { border-radius: 999px; }
+.hc-text .btn--secondary { color: var(--p-inv-ink); border-color: rgb(255 255 255 / 0.35); background: transparent; }
+
+/* três destaques, separados do resto por uma linha fina */
+.hc-facts {
+  margin: var(--s-7) 0 0; padding-top: var(--s-4);
+  display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--s-6);
+  border-top: 1px solid rgb(255 255 255 / 0.22);
+}
+.hc-facts dt { font: italic var(--display-weight) 22px/1.15 var(--font-display); color: var(--p-inv-ink); }
+.hc-facts dd { margin: 4px 0 0; font-size: 13px; color: var(--p-inv-muted); }
+
+/* anotação sobre a foto, apontando o balcão com o monograma */
+.hc-callout {
+  position: absolute; z-index: 1; margin: 0;
+  right: 7%; bottom: 26%;
+  display: flex; align-items: center; gap: var(--s-3);
+  color: var(--p-inv-ink); font-size: var(--t-small);
+}
+.hc-callout__dot {
+  position: relative; width: 14px; height: 14px; border-radius: 50%; flex: none;
+  background: var(--hc-gold); box-shadow: 0 0 0 6px rgb(204 158 99 / 0.28);
+}
+.hc-callout__dot::after { content: ""; position: absolute; left: 100%; top: 50%; width: 28px; height: 1px; background: rgb(255 255 255 / 0.6); }
+.hc-callout__card {
+  margin-left: 28px; display: grid; gap: 2px; padding: var(--s-3) var(--s-4);
+  border-radius: 14px; background: rgb(var(--hc-cacau) / 0.62); border: 1px solid rgb(255 255 255 / 0.2);
+  backdrop-filter: blur(6px);
+}
+.hc-callout__card strong { font-weight: 500; }
+.hc-callout__card span { color: var(--p-inv-muted); font-size: 13px; }
+
+/* desktop estreito (1024–1279): o texto ocupa mais da largura, então o véu vai mais longe */
+@media (min-width: 1024px) and (max-width: 1279px) {
+  .hc-text { max-width: 520px; }
+  .hc-facts { display: none; }
+  .hc-veil {
+    background:
+      linear-gradient(90deg, rgb(var(--hc-cacau)) 0%, rgb(var(--hc-cacau)) 48%, rgb(var(--hc-cacau) / 0.72) 58%, rgb(var(--hc-cacau) / 0) 76%),
+      linear-gradient(to top, rgb(var(--hc-cacau) / 0.55) 0%, rgb(var(--hc-cacau) / 0) 34%);
+  }
+  .hc-callout { right: 4%; }
+}
+
+/* tablet e celular: a foto ocupa o espaço que o texto deixa, o texto embaixo sobre o cacau */
+@media (max-width: 1023px) {
+  .hc-media { position: relative; inset: auto; width: 100%; height: auto; flex: 1 1 auto; min-height: 220px; z-index: 0; }
+  .hc-media::after { content: ""; position: absolute; inset: auto 0 0 0; height: 45%; background: linear-gradient(to top, rgb(var(--hc-cacau)) 0%, rgb(var(--hc-cacau) / 0) 100%); pointer-events: none; }
+  .hc-media img { object-position: 50% 58%; }
+  .hc-veil, .hc-callout, .hc-facts { display: none; }
+  .hc-content.wrap { position: relative; z-index: 1; margin-top: calc(-1 * var(--s-7)); padding-block: 0 var(--s-6); flex: none; }
+  .hc-title { margin-top: var(--s-5); }
+}
+@media (max-width: 639px) {
+  :root { --hc-radius: 20px; --hc-inset: 8px; }
+  .hc-content.wrap { width: calc(100% - 2 * (var(--gut) - var(--hc-inset))); padding-bottom: var(--s-5); }
+  .hc-title { font-size: clamp(36px, 10.6vw, 44px); margin-top: var(--s-4); }
+  .hc-lead { font-size: 16px; margin-top: var(--s-4); }
+  .hc-text .btn-row { margin-top: var(--s-5); }
+  .hc-badge__meta { display: none; }
+}
+
+/* ---------- entrada em cascata do Solenime (só quando a tela de abertura roda) */
+@keyframes hc-up { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: none; } }
+@keyframes hc-clip { from { clip-path: inset(100% 0 0 0); } to { clip-path: inset(0); } }
+@keyframes hc-settle { from { transform: scale(1.06); } to { transform: none; } }
+html.has-intro .hc-enter { animation: hc-up 700ms var(--hc-out) both; animation-delay: calc(var(--i, 0) * 60ms + 80ms); }
+html.has-intro .hc-media { animation: hc-clip 900ms var(--hc-io) 150ms both; }
+html.has-intro .hc-media img { animation: hc-settle 1600ms var(--hc-out) 150ms both; }
+html.has-intro .hc-callout { animation: hc-up 700ms var(--hc-out) 700ms both; }
+html.is-loading .hc-enter, html.is-loading .hc-media, html.is-loading .hc-media img, html.is-loading .hc-callout { animation-play-state: paused; }
+@media (prefers-reduced-motion: reduce) {
+  html.has-intro .hc-enter, html.has-intro .hc-media, html.has-intro .hc-media img, html.has-intro .hc-callout { animation: none; }
+}
+
+/* ==========================================================================
+   TELA DE ABERTURA (uma vez por sessão; sem JavaScript ela nem aparece)
+   ========================================================================== */
+#intro {
+  position: fixed; inset: 0; z-index: 100;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  background: var(--p-bg); color: var(--p-ink);
+  clip-path: inset(0 0 0 0); transition: clip-path 900ms var(--hc-io);
+}
+#intro.is-out { clip-path: inset(0 0 100% 0); }
+#intro .i-mark { display: flex; flex-direction: column; align-items: center; transition: transform 800ms var(--hc-io), opacity 500ms ease; }
+#intro.is-out .i-mark { transform: translateY(-32px); opacity: 0; }
+#intro .i-logo { width: 72px; height: 72px; border-radius: 50%; opacity: 0; transform: scale(0.92); transition: opacity 700ms var(--hc-out), transform 900ms var(--hc-out); }
+/* nome com o efeito "Hero Shutter Text" (21st.dev, @daiwiikharihar), portado para CSS:
+   cada letra sai do desfoque enquanto três fatias atravessam em direções alternadas */
+#intro .i-word {
+  margin-top: var(--s-5); display: flex; flex-wrap: wrap; justify-content: center;
+  font: italic 400 clamp(48px, 7vw, 96px) / 1.05 var(--font-display); letter-spacing: -0.01em;
+}
+#intro .sh { position: relative; display: inline-block; overflow: hidden; padding: 0 0.03em 0.08em; }
+#intro .sh-main { display: inline-block; opacity: 0; filter: blur(10px); }
+#intro .sh-s { position: absolute; inset: 0 0.03em 0.08em; opacity: 0; pointer-events: none; }
+#intro .sh-t { color: var(--brand-gold); clip-path: polygon(0 0, 100% 0, 100% 35%, 0 35%); }
+#intro .sh-m { color: var(--p-accent); clip-path: polygon(0 35%, 100% 35%, 100% 65%, 0 65%); }
+#intro .sh-b { color: var(--brand-gold); clip-path: polygon(0 65%, 100% 65%, 100% 100%, 0 100%); }
+@keyframes sh-in { to { opacity: 1; filter: blur(0); } }
+@keyframes sh-lr { 0% { transform: translateX(-100%); opacity: 0; } 50% { opacity: 1; } 100% { transform: translateX(100%); opacity: 0; } }
+@keyframes sh-rl { 0% { transform: translateX(100%); opacity: 0; } 50% { opacity: 1; } 100% { transform: translateX(-100%); opacity: 0; } }
+#intro.is-ready .sh-main { animation: sh-in 800ms ease forwards; animation-delay: calc(var(--i) * 40ms + 300ms); }
+#intro.is-ready .sh-t { animation: sh-lr 700ms ease-in-out both; animation-delay: calc(var(--i) * 40ms); }
+#intro.is-ready .sh-m { animation: sh-rl 700ms ease-in-out both; animation-delay: calc(var(--i) * 40ms + 100ms); }
+#intro.is-ready .sh-b { animation: sh-lr 700ms ease-in-out both; animation-delay: calc(var(--i) * 40ms + 200ms); }
+#intro .i-small {
+  margin-top: var(--s-2); font: 500 12px/1 var(--font-text); letter-spacing: 0.32em; margin-right: -0.32em;
+  text-transform: uppercase; color: var(--p-accent); opacity: 0; transition: opacity 700ms ease 400ms;
+}
+#intro .i-line { margin-top: var(--s-6); width: 128px; height: 1px; background: color-mix(in oklab, var(--brand-gold) 40%, transparent); overflow: hidden; }
+#intro .i-line i { display: block; height: 100%; background: var(--p-accent); transform: scaleX(0); transform-origin: left; transition: transform 1400ms var(--hc-out) 300ms; }
+#intro .i-foot {
+  position: absolute; bottom: 40px; font: 500 11px/1 var(--font-text); letter-spacing: 0.24em; margin-right: -0.24em;
+  text-transform: uppercase; color: var(--p-accent); opacity: 0; transition: opacity 700ms ease 500ms;
+}
+#intro.is-ready .i-logo { opacity: 1; transform: none; }
+#intro.is-ready .i-small, #intro.is-ready .i-foot { opacity: 1; }
+#intro.is-ready .i-line i { transform: scaleX(0.72); }
+#intro.is-done .i-line i { transform: scaleX(1); transition-duration: 320ms; transition-delay: 0ms; }
+#intro.is-out .i-foot { opacity: 0; transition-delay: 0ms; transition-duration: 300ms; }
+html.no-intro #intro { display: none; }
+@media (prefers-reduced-motion: reduce) {
+  #intro, #intro * { transition-duration: 1ms !important; transition-delay: 0ms !important; }
+  #intro .sh-main { opacity: 1; filter: none; animation: none !important; }
+  #intro .sh-s { display: none; }
+  #intro { transition: opacity 200ms ease !important; }
+  #intro.is-out { clip-path: none; opacity: 0; }
+}
+
+/* ==========================================================================
+   MÍDIA QUE CRESCE COM A ROLAGEM (adaptado do "Scroll media expansion hero", 21st.dev)
+   --p vai de 0 a 1 enquanto a seção (duas telas) passa; a parte fixa usa position: sticky.
+   ========================================================================== */
+main > .section.sxm { --h: 2; --hm: 2; padding: 0; background: rgb(var(--hc-cacau)); color: var(--p-inv-ink); }
+.sxm { --p: 0; }
+.sxm__pin {
+  position: sticky; top: var(--nav); height: calc(100svh - var(--nav)); overflow: hidden;
+  display: grid; place-items: center; isolation: isolate;
+}
+.sxm__bg { position: absolute; inset: 0; z-index: -2; opacity: calc(1 - var(--p)); }
+.sxm__bg > picture, .sxm__bg > .slot { position: absolute; inset: 0; display: block; }
+.sxm__bg img { width: 100%; height: 100%; object-fit: cover; }
+.sxm__bg::after { content: ""; position: absolute; inset: 0; background: rgb(var(--hc-cacau) / 0.55); }
+
+.sxm__media {
+  position: absolute; left: 50%; top: 50%; z-index: -1; translate: -50% -50%;
+  width: calc(300px + var(--p) * (min(94vw, 1280px) - 300px));
+  height: calc(400px + var(--p) * (min(100svh - var(--nav) - 48px, 820px) - 400px));
+  border-radius: calc(20px - var(--p) * 4px); overflow: hidden;
+  box-shadow: 0 0 50px rgb(0 0 0 / 0.3); background: rgb(var(--hc-cacau));
+}
+.sxm__video { width: 100%; height: 100%; object-fit: cover; display: block; }
+.sxm__shade { position: absolute; inset: 0; background: rgb(0 0 0 / calc(0.5 - var(--p) * 0.4)); pointer-events: none; }
+.sxm__controls { position: absolute; right: 16px; bottom: 16px; display: flex; gap: var(--s-2); }
+.sxm__btn {
+  min-height: 44px; padding: 0 var(--s-5);
+  border-radius: 999px; border: 1px solid rgb(255 255 255 / 0.45); background: rgb(var(--hc-cacau) / 0.6);
+  color: var(--p-inv-ink); font: 500 var(--t-small)/1 var(--font-text); cursor: pointer;
+  opacity: 0; visibility: hidden; transition: opacity 300ms var(--hc-out), visibility 0s 300ms;
+}
+.sxm.is-open .sxm__btn { opacity: 1; visibility: visible; transition: opacity 300ms var(--hc-out); }
+@media (hover: hover) and (pointer: fine) { .sxm__btn:hover { background: rgb(var(--hc-cacau) / 0.85); } }
+
+/* título que se abre para os lados, como no original */
+.sxm__text { display: grid; justify-items: center; gap: var(--s-3); text-align: center; pointer-events: none; opacity: calc(1 - var(--p) * 1.4); }
+.sxm__title { margin: 0; display: grid; justify-items: center; font: var(--display-weight) clamp(40px, 5.4vw, 80px) / 1.02 var(--font-display); letter-spacing: var(--display-tracking-xl); color: var(--p-inv-ink); }
+.sxm__title .sxm__r { font-style: italic; color: var(--hc-gold); }
+.sxm__eyebrow, .sxm__hint { margin: 0; font-size: var(--t-small); color: var(--p-inv-muted); letter-spacing: 0.02em; }
+.sxm__l { display: block; transform: translateX(calc(var(--p) * -40vw)); }
+.sxm__r { display: block; transform: translateX(calc(var(--p) * 40vw)); }
+
+@media (max-width: 767px) {
+  .sxm__media {
+    width: calc(240px + var(--p) * (92vw - 240px));
+    height: calc(340px + var(--p) * (100svh - var(--nav) - 32px - var(--bar, 0px) - 340px));
+    top: calc(50% - var(--bar, 0px) / 2);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .sxm { --p: 1 !important; }
+  .sxm__text { position: absolute; left: 0; right: 0; top: var(--s-6); opacity: 1; z-index: 1; }
+  .sxm__l, .sxm__r { transform: none; }
+  .sxm__media { height: calc(100svh - var(--nav) - 48px); }
+}
+/* o pausar fica sempre disponível enquanto o vídeo toca; o som aparece com o vídeo aberto */
+.sxm .sxm__pause { opacity: 1; visibility: visible; }
+@media (max-width: 767px) { .sxm__controls { right: 12px; bottom: 12px; } .sxm__btn { padding: 0 var(--s-4); } }

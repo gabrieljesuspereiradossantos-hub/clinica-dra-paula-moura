@@ -1,0 +1,16 @@
+---
+/** Ícones reais (Simple Icons, monocromáticos) e um telefone desenhado simples. Sempre decorativos:
+ *  o link ou botão ao redor carrega o nome acessível. */
+import instagram from '../../public/assets/icons/instagram.svg?raw';
+import whatsapp from '../../public/assets/icons/whatsapp.svg?raw';
+import googlemaps from '../../public/assets/icons/googlemaps.svg?raw';
+
+interface Props { name: 'instagram' | 'whatsapp' | 'googlemaps' | 'phone'; }
+const { name } = Astro.props;
+const phone = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 3.5h3.2l1.6 4-2 1.3a11 11 0 0 0 5.4 5.4l1.3-2 4 1.6V17a2.5 2.5 0 0 1-2.5 2.5A15 15 0 0 1 2.5 6 2.5 2.5 0 0 1 5 3.5z"/></svg>';
+const raw = { instagram, whatsapp, googlemaps, phone }[name];
+const svg = raw
+  .replace(/\s(role|aria-label)="[^"]*"/g, '')
+  .replace('<svg', '<svg class="ic-svg" aria-hidden="true" focusable="false"');
+---
+<Fragment set:html={svg} />

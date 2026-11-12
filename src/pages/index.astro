@@ -1,0 +1,278 @@
+---
+import Base from '../layouts/Base.astro';
+import Photo from '../components/Photo.astro';
+import Pending from '../components/Pending.astro';
+import Icon from '../components/Icon.astro';
+import ContactForm from '../components/ContactForm.astro';
+import ScrollExpandMedia from '../components/ScrollExpandMedia.astro';
+import { site, links, shows, flags, reviewMode } from '../config/site';
+import { hero, about, services, statement, space, steps, testimonials, faq, contact, headSpa, video, images, results, videoMoment } from '../content/content';
+
+const a = site.address;
+const headSpaWhatsapp = `https://wa.me/${site.contact.whatsapp.number}?text=${encodeURIComponent(headSpa.whatsappMessage)}`;
+/* A seção "O espaço" só aparece na versão pública quando houver pelo menos uma foto do espaço. */
+const spacePhotos = ['space1', 'space2', 'space3'].filter((k) => images[k]?.file);
+const showSpace = reviewMode || spacePhotos.length > 0;
+const spaceSlots = reviewMode ? ['space1', 'space2', 'space3'] : spacePhotos;
+const resultCases = results.cases.filter((c) => images[c.slot]?.file);
+const resultSlots = resultCases.map((c) => c.slot);
+const namesMissing = resultCases.some((c) => !c.procedure);
+const claims = Object.values(site.claims).filter(shows);
+
+/* Schema.org: só dados confirmados/públicos. Sem nota agregada (o Google não aceita avaliações próprias). */
+const schema = {
+  '@context': 'https://schema.org',
+  '@type': 'HealthAndBeautyBusiness',
+  name: site.name,
+  description: site.seo.description,
+  ...(site.url ? { url: site.url + '/', image: site.url + site.seo.ogImage } : {}),
+  logo: site.url ? site.url + site.logo.src : undefined,
+  telephone: site.contact.phoneE164,
+  address: {
+    '@type': 'PostalAddress',
+    streetAddress: `${a.street}, ${a.complement}`,
+    addressLocality: a.city,
+    addressRegion: a.state,
+    postalCode: a.postalCode,
+    addressCountry: a.country,
+  },
+  areaServed: a.city,
+  sameAs: [site.contact.instagram.url],
+  hasMap: site.contact.mapsUrl,
+  openingHoursSpecification: site.hours.rows
+    .filter((r) => r.opens)
+    .map((r) => ({ '@type': 'OpeningHoursSpecification', dayOfWeek: r.schema, opens: r.opens, closes: r.closes })),
+  potentialAction: { '@type': 'ReserveAction', target: site.contact.bookingUrl, name: 'Agendar avaliação' },
+};
+---
+<Base schema={schema}>
+
+  <!-- HERO (padrão Solenime + referência Aesthetic Dental Clinic): a recepção num quadro de cantos arredondados,
+       véu escuro da esquerda, título em três linhas com a do meio em itálico dourado, selo da nota do Google,
+       anotação apontando o balcão e três destaques. Entrada em cascata (hc-enter) depois da tela de abertura. -->
+  <section class="hero hero--clinic" data-enter aria-labelledby="hero-h">
+    <div class="hc-frame ground-inverse">
+      <div class="hc-media" data-enter-media>
+        <Photo slot="heroRecepcao" class="hc-img" eager sizes="(min-width: 1024px) 62vw, 100vw" />
+      </div>
+      <div class="hc-veil" aria-hidden="true"></div>
+      <p class="hc-callout"><span class="hc-callout__dot" aria-hidden="true"></span><span class="hc-callout__card"><strong>{hero.callout.title}</strong><span>{hero.callout.text}</span></span></p>
+      <div class="wrap hc-content">
+        <div class="hero-text hc-text">
+          {site.rating.show && (
+            <a class="hc-badge hc-enter" style="--i: 0" href={links.reviews} target="_blank" rel="noopener">
+              <img src={site.logo.small} alt="" width="32" height="32" />
+              <span class="hc-badge__score">{site.rating.value} <span class="hc-stars" aria-hidden="true">★★★★★</span></span>
+              <span class="hc-badge__meta">{site.rating.count} avaliações no {site.rating.source}</span>
+            </a>
+          )}
+          <h1 id="hero-h" class="hc-title hc-enter" style="--i: 1">
+            {hero.lines.map((l, i) => i === hero.italicLine ? <em class="hc-title__em">{l} </em> : <span>{l} </span>)}
+          </h1>
+          <p class="hero__lead hc-lead hc-enter" style="--i: 2">{hero.lead}</p>
+          <div class="btn-row hc-enter" style="--i: 3">
+            <a class="btn btn--primary" href={links.booking} target="_blank" rel="noopener">Agendar avaliação<svg class="m-arrow" viewBox="0 0 12 12" aria-hidden="true"><path class="m-arrow__stem" d="M1 6h8"/><path class="m-arrow__head" d="M4.5 2.5 8 6l-3.5 3.5"/></svg></a>
+            <a class="btn btn--secondary" href={links.whatsapp} target="_blank" rel="noopener">Falar pelo WhatsApp</a>
+          </div>
+          <dl class="hc-facts hc-enter" style="--i: 4">
+            {hero.facts.map(([t, d]) => (<div><dt>{t}</dt><dd>{d}</dd></div>))}
+          </dl>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- MOMENTO: o vídeo da Dra. Paula cresce com a rolagem (adaptado do Scroll media expansion hero, 21st.dev) -->
+  <ScrollExpandMedia id="video" videoSrc={video.src} loopSrc={video.loop} poster={video.poster} label={video.label} bgSlot="greenWall"
+    titleStart={videoMoment.titleStart} titleEnd={videoMoment.titleEnd} eyebrow={videoMoment.eyebrow} hint={videoMoment.hint} />
+
+  <!-- SOBRE: a profissional, com fatos verificáveis -->
+  <section class="section" id="sobre" style="--hm: 2" aria-labelledby="sobre-h">
+    <div class="wrap grid">
+      <div class="span-6 stack-6">
+        <div class="section-head">
+          <h2 id="sobre-h">{about.title} <span class="muted">{about.titleMuted}</span></h2>
+        </div>
+        <div class="stack-4 measure">
+          {about.text.map((p) => <p>{p}</p>)}
+          {reviewMode && !about.confirmedText && <p class="review-note"><Pending note="texto de apresentação para a Dra. Paula revisar" /></p>}
+        </div>
+        <ul class="rows rows--spec">
+          {claims.map((c) => (
+            <li><span class="rows__name">{c.value}{flags(c) && <Pending note={c.note} />}</span></li>
+          ))}
+          <li><span class="rows__name">Instagram</span><a class="link ig-link" href={links.instagram} target="_blank" rel="noopener">{site.contact.instagram.handle}</a></li>
+        </ul>
+      </div>
+      <div class="span-6 start-7 col-fill">
+        <div class="frame frame--photo frame--fit"><Photo slot="about" sizes="(min-width: 1024px) 628px, 100vw" /></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ÁREAS DE CUIDADO (services-list) -->
+  <section class="section" id="cuidados" style="--hm: 2" aria-labelledby="cuidados-h">
+    <div class="wrap stack-6">
+      <div class="section-head">
+        <h2 id="cuidados-h">{services.title} <span class="muted">{services.titleMuted}</span></h2>
+      </div>
+      <div class="grid">
+        <ul class="rows span-6">
+          {services.items.slice(0, 3).map((s) => (
+            <li><span class="rows__name">{s.name}{!s.confirmed && <Pending />}</span><p>{s.line}</p></li>
+          ))}
+        </ul>
+        <ul class="rows span-6 start-7">
+          {services.items.slice(3).map((s) => (
+            <li><span class="rows__name">{s.name}{!s.confirmed && <Pending />}</span><p>{s.line}</p></li>
+          ))}
+        </ul>
+      </div>
+      <div class="frame frame--photo frame--band"><Photo slot="services" sizes="(min-width: 1280px) 1280px, 100vw" /></div>
+    </div>
+  </section>
+
+  <!-- HEAD SPA: pacotes e valores -->
+  <section class="section" id="head-spa" style="--hm: 2" aria-labelledby="headspa-h">
+    <div class="wrap grid">
+      <div class="span-6 stack-6">
+        <div class="section-head">
+          <h2 id="headspa-h">{headSpa.title} <span class="muted">{headSpa.titleMuted}</span></h2>
+          {reviewMode && !headSpa.pricesConfirmed && <p class="review-note"><Pending note="conferir se os valores dos posts continuam valendo" /></p>}
+        </div>
+        <ul class="rows">
+          {headSpa.packages.map((p) => (
+            <li><span class="rows__name">{p.name}<small class="rows__meta">{p.duration}</small></span><span class="rows__value">{p.price}</span><p>{p.includes}</p></li>
+          ))}
+        </ul>
+        <p class="t-small muted">{headSpa.finish}</p>
+        <a class="link" href={headSpaWhatsapp} target="_blank" rel="noopener">Reservar o Head Spa pelo WhatsApp</a>
+      </div>
+      <div class="span-6 start-7 col-fill">
+        <div class="frame frame--photo frame--fit"><Photo slot="headspa" sizes="(min-width: 1024px) 628px, 100vw" /></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ABORDAGEM: momento word-highlight (frase em destaque) -->
+  <section class="section statement" id="abordagem" data-moment="word-highlight" aria-label={statement.label}>
+    <div class="wrap">
+      <p class="t-label">{statement.label}</p>
+      <p class="mo-wh__text">{statement.before} <strong>{statement.strong}</strong>{statement.after}</p>
+    </div>
+  </section>
+
+  <!-- COMO FUNCIONA (etapas) + avaliações públicas -->
+  <section class="section" id="avaliacao" style="--hm: 2" aria-labelledby="avaliacao-h">
+    <div class="wrap grid">
+      <div class="span-6 stack-6">
+        <div class="section-head">
+          <h2 id="avaliacao-h">{steps.title}</h2>
+        </div>
+        <ol class="rows steps-list">
+          {steps.items.map((s, i) => (
+            <li><span class="rows__name"><span class="step-num">{i + 1}</span>{s.title}</span><p>{s.text}</p></li>
+          ))}
+        </ol>
+        {testimonials.length > 0 && testimonials.slice(0, 1).map((t) => (
+          <figure class="quote"><blockquote>{t.quote}</blockquote><figcaption class="person__name">{t.name}</figcaption></figure>
+        ))}
+        {site.rating.show && (
+          <div class="rating">
+            <span class="rating__score">{site.rating.value} de 5</span>
+            <span class="rating__meta">{site.rating.count} avaliações públicas no {site.rating.source}, consultadas em {site.rating.checkedAt}</span>
+            <a class="link" href={links.reviews} target="_blank" rel="noopener">Ler as avaliações no Google</a>
+          </div>
+        )}
+      </div>
+      <div class="span-6 start-7 col-fill">
+        <div class="frame frame--photo frame--fit"><Photo slot="consult" sizes="(min-width: 1024px) 628px, 100vw" /></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- RESULTADOS: antes e depois autorizados -->
+  {resultSlots.length > 0 && (
+  <section class="section" id="resultados" style="--hm: 2" aria-labelledby="resultados-h">
+    <div class="wrap stack-6">
+      <div class="section-head">
+        <h2 id="resultados-h">{results.title} <span class="muted">{results.titleMuted}</span></h2>
+        {reviewMode && namesMissing && <p class="review-note"><Pending note="informar o procedimento de cada caso" /></p>}
+      </div>
+      <div class="trio trio--results">
+        {resultCases.map((c) => (
+          <div class="ba-case">
+            <div class="frame frame--photo"><Photo slot={c.slot} sizes="(min-width: 1024px) 410px, 100vw" /></div>
+            {c.procedure && <p class="ba-case__name">{c.procedure}</p>}
+          </div>
+        ))}
+      </div>
+      <p class="t-small muted measure">{results.note}</p>
+    </div>
+  </section>
+  )}
+
+  <!-- PERGUNTAS FREQUENTES -->
+  <section class="section" id="duvidas" style="--hm: 2" aria-labelledby="duvidas-h">
+    <div class="wrap stack-6">
+      <div class="section-head section-head--split">
+        <div><h2 id="duvidas-h">{faq.title}</h2><p>{faq.lead}</p></div>
+        <a class="link" href={links.whatsapp} target="_blank" rel="noopener">Enviar outra pergunta pelo WhatsApp</a>
+      </div>
+      <div class="grid">
+        <div class="faq span-6">
+          {faq.items.slice(0, 3).map((f) => (<div class="faq__item"><h3>{f.q}</h3><p>{f.a}</p></div>))}
+        </div>
+        <div class="faq span-6 start-7">
+          {faq.items.slice(3).map((f) => (<div class="faq__item"><h3>{f.q}</h3><p>{f.a}</p></div>))}
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- O ESPAÇO: três fotos da clínica -->
+  {showSpace && (
+  <section class="section" id="clinica" aria-labelledby="clinica-h">
+    <div class="wrap stack-6">
+      <div class="section-head">
+        <h2 id="clinica-h">{space.title} <span class="muted">{space.titleMuted}</span></h2>
+      </div>
+      <div class={`trio trio--${spaceSlots.length}`}>
+        {spaceSlots.map((k, i) => <div class="frame frame--photo"><Photo slot={k} sizes={i === 0 ? "(min-width: 1024px) 410px, 100vw" : "(min-width: 1024px) 410px, (min-width: 640px) 33vw, 50vw"} /></div>)}
+      </div>
+    </div>
+  </section>
+  )}
+
+  <!-- CONTATO: endereço, horários, canais e formulário -->
+  <section class="section g2m" id="contato" aria-labelledby="contato-h">
+    <div class="wrap grid contact-grid">
+      <div class="span-5 stack-6">
+        <div class="section-head">
+          <h2 id="contato-h">{contact.title}</h2>
+          <p>{contact.lead}</p>
+        </div>
+        <address class="contact-address">{a.street}, {a.complement}<br>{a.district}, {a.city} – {a.state}<br>CEP {a.postalCode}</address>
+        {flags(a.access) && <p class="review-note"><Pending note={a.access.note} /></p>}
+        {shows(a.access) && a.access.value && <p>{a.access.value}</p>}
+        <div class="stack-2">
+          <p class="t-label">Horários{!site.hours.confirmed && <Pending note="horários do Google Maps" />}</p>
+          <dl class="hours" data-tz={site.hours.timeZone}>
+            {site.hours.rows.map((r) => (<><dt data-days={r.days}>{r.label}</dt><dd>{r.text}</dd></>))}
+          </dl>
+        </div>
+        <ul class="contact-list">
+          <li><a class="link" href={links.maps} target="_blank" rel="noopener"><Icon name="googlemaps" />Abrir no Google Maps</a></li>
+          <li><a class="link" href={links.phone}><Icon name="phone" />Ligar para {site.contact.phoneDisplay}</a></li>
+          <li><a class="link" href={links.instagram} target="_blank" rel="noopener"><Icon name="instagram" />Ver o Instagram {site.contact.instagram.handle}</a></li>
+        </ul>
+      </div>
+      <div class="span-6 start-7 form-card stack-4">
+        <h3 id="form-h">{contact.formTitle}</h3>
+        <p class="form-lead">{contact.formLead}</p>
+        <ContactForm />
+      </div>
+    </div>
+  </section>
+
+</Base>

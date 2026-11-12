@@ -1,0 +1,110 @@
+---
+/**
+ * Mídia que cresce com a rolagem.
+ * Adaptado do componente "Scroll media expansion hero" (21st.dev, @arunachalam), portado de React +
+ * framer-motion para HTML/CSS/JS puros. Diferença importante: o original bloqueava a roda do mouse e
+ * forçava a página ao topo (scroll-jacking); aqui a rolagem é a nativa e a seção usa position: sticky
+ * dentro de duas telas. Com "reduzir movimento" a mídia já aparece expandida, parada.
+ */
+import Photo from './Photo.astro';
+import { images } from '../content/content';
+
+interface Props {
+  id: string;
+  videoSrc: string;
+  /** versão curta, leve e sem áudio para o loop mudo; a completa (com som) só baixa no "Ativar som" */
+  loopSrc: string;
+  poster: string;
+  label: string;
+  bgSlot: keyof typeof images;
+  titleStart: string;
+  titleEnd: string;
+  eyebrow: string;
+  hint: string;
+}
+const { id, videoSrc, loopSrc, poster, label, bgSlot, titleStart, titleEnd, eyebrow, hint } = Astro.props;
+---
+<section class="section sxm" id={id} aria-labelledby={`${id}-h`} data-moment-own>
+  <div class="sxm__pin">
+    <div class="sxm__bg" aria-hidden="true"><Photo slot={bgSlot} class="" sizes="100vw" /></div>
+    <div class="sxm__media">
+      <video class="sxm__video" muted loop playsinline preload="none" poster={poster} aria-label={label} width="720" height="1280" data-src={loopSrc} data-full={videoSrc}></video>
+      <div class="sxm__shade" aria-hidden="true"></div>
+      <div class="sxm__controls">
+        <button class="sxm__btn sxm__pause" type="button" aria-pressed="false">Pausar vídeo</button>
+        <button class="sxm__btn sxm__sound" type="button" aria-pressed="false">Ativar som</button>
+      </div>
+    </div>
+    <div class="sxm__text">
+      <p class="sxm__eyebrow sxm__l">{eyebrow}</p>
+      <h2 id={`${id}-h`} class="sxm__title"><span class="sxm__l">{titleStart}</span> <span class="sxm__r">{titleEnd}</span></h2>
+      <p class="sxm__hint sxm__r">{hint}</p>
+    </div>
+  </div>
+</section>
+
+<script is:inline>
+  (function () {
+    document.querySelectorAll('.sxm').forEach(function (sec) {
+      var media = sec.querySelector('.sxm__media');
+      var video = sec.querySelector('.sxm__video');
+      var sound = sec.querySelector('.sxm__sound');
+      var pause = sec.querySelector('.sxm__pause');
+      var paused = false; // pausado pela pessoa: a rolagem não volta a tocar
+      var reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+      var saveData = navigator.connection && navigator.connection.saveData;
+      var ticking = false;
+
+      function set(p) {
+        sec.style.setProperty('--p', p.toFixed(4));
+        sec.classList.toggle('is-open', p > 0.92);
+      }
+      function update() {
+        ticking = false;
+        var r = sec.getBoundingClientRect();
+        var travel = Math.max(1, sec.offsetHeight - innerHeight);
+        var p = Math.min(1, Math.max(0, -r.top / (travel * 0.8)));
+        set(p);
+      }
+      if (reduce) { set(1); } else {
+        update();
+        addEventListener('scroll', function () { if (!ticking) { ticking = true; requestAnimationFrame(update); } }, { passive: true });
+        addEventListener('resize', update);
+      }
+
+      // o vídeo só baixa quando a seção chega perto e toca mudo enquanto ela está na tela
+      var loaded = false;
+      var io = new IntersectionObserver(function (es) {
+        es.forEach(function (e) {
+          if (e.isIntersecting) {
+            if (!loaded && !saveData) { video.src = video.dataset.src; loaded = true; }
+            if (loaded && !reduce && !paused) video.play().catch(function () {});
+          } else if (loaded) { video.pause(); }
+        });
+      }, { rootMargin: '200px 0px' });
+      io.observe(sec);
+
+      if (reduce) { paused = true; pause.setAttribute('aria-pressed', 'true'); pause.textContent = 'Reproduzir vídeo'; }
+      pause.addEventListener('click', function () {
+        if (!loaded) { video.src = video.dataset.src; loaded = true; }
+        paused = !paused;
+        if (paused) video.pause(); else video.play().catch(function () {});
+        pause.setAttribute('aria-pressed', String(paused));
+        pause.textContent = paused ? 'Reproduzir vídeo' : 'Pausar vídeo';
+      });
+
+      var full = false;
+      sound.addEventListener('click', function () {
+        loaded = true;
+        if (!full) { video.src = video.dataset.full; video.loop = false; full = true; }
+        var on = video.muted;
+        video.muted = !on;
+        if (on) { video.currentTime = 0; paused = false; pause.setAttribute('aria-pressed', 'false'); pause.textContent = 'Pausar vídeo';
+          // se o navegador recusar tocar com som, mostra os controles nativos para a pessoa apertar o play
+          video.play().catch(function () { video.controls = true; }); }
+        sound.setAttribute('aria-pressed', String(on));
+        sound.textContent = on ? 'Desativar som' : 'Ativar som';
+      });
+    });
+  })();
+</script>
