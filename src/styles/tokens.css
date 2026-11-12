@@ -42,11 +42,21 @@
 }
 
 /* ---------- logo da cliente (PNG com cantos brancos → recorte circular) */
+/* a logo em destaque: menu mais alto (84 px), monograma de 56 px e o nome com "Estética avançada" embaixo.
+   O kit força img do menu a 24 px (.nav__logo img); aqui a regra é mais específica. */
+:root { --nav: 84px; }
+@media (max-width: 639px) { :root { --nav: 64px; } }
 .nav__logo { gap: var(--s-3); }
-.logo-img { width: 40px; height: 40px; border-radius: 50%; flex: none; display: block; }
-@media (max-width: 639px) { .logo-img { width: 32px; height: 32px; } }
-.nav__logo .logo-text { white-space: nowrap; }
-@media (max-width: 400px) { .nav__logo .logo-text { font-size: 18px; } }
+.logo-img, .nav__logo img.logo-img { width: 56px; height: 56px; border-radius: 50%; flex: none; display: block; box-shadow: 0 0 0 1px color-mix(in oklab, var(--brand-gold) 35%, transparent), 0 6px 18px -8px rgb(43 33 26 / 0.35); }
+.nav__logo .logo-text { display: flex; flex-direction: column; gap: 4px; white-space: nowrap; }
+.nav__logo .logo-name { font-size: 27px; line-height: 1; letter-spacing: -0.02em; }
+.nav__logo .logo-sub { font-family: var(--font-body, "Instrument Sans"), sans-serif; font-size: 11px; line-height: 1; font-weight: 500; letter-spacing: 0.22em; text-transform: uppercase; color: var(--p-accent); }
+@media (max-width: 639px) {
+  .logo-img, .nav__logo img.logo-img { width: 44px; height: 44px; }
+  .nav__logo .logo-name { font-size: 22px; }
+  .nav__logo .logo-sub { font-size: 9.5px; letter-spacing: 0.18em; }
+}
+@media (max-width: 360px) { .nav__logo .logo-name { font-size: 19px; } .nav__logo .logo-sub { display: none; } }
 
 /* ---------- espaço reservado de foto (sem imagem aprovada) */
 .slot {

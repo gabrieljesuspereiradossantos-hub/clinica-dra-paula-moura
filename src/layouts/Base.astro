@@ -124,7 +124,7 @@ const year = new Date().getFullYear();
 <header class="nav">
   <div class="wrap nav__bar">
     <a class="skip-link" href="#top">Pular para o conteúdo</a>
-    <a class="nav__logo" href={inner ? '/' : '#top'}><img class="logo-img" src={site.logo.small} alt="" width="40" height="40"><span class="logo-text">{site.shortName}</span></a>
+    <a class="nav__logo" href={inner ? '/' : '#top'} aria-label={`${site.shortName}, estética avançada: início`}><img class="logo-img" src={site.logo.nav} alt="" width="56" height="56"><span class="logo-text"><span class="logo-name">{site.shortName}</span><span class="logo-sub">Estética avançada</span></span></a>
     <nav class="nav__links" aria-label="Principal">
       <div class="nav__item"><a class="nav__link" href={`${home}#sobre`}>Sobre</a></div>
       <div class="nav__item">
@@ -181,7 +181,7 @@ const year = new Date().getFullYear();
     <div class="closing__links">
       <div class="grid">
         <div class="span-4 stack-4">
-          <a class="nav__logo" href={inner ? '/' : '#top'}><img class="logo-img" src={site.logo.small} alt="" width="40" height="40" loading="lazy" decoding="async"><span class="logo-text">{site.shortName}</span></a>
+          <a class="nav__logo" href={inner ? '/' : '#top'} aria-label={`${site.shortName}, estética avançada: início`}><img class="logo-img" src={site.logo.nav} alt="" width="56" height="56" loading="lazy" decoding="async"><span class="logo-text"><span class="logo-name">{site.shortName}</span><span class="logo-sub">Estética avançada</span></span></a>
           <p class="footer__lede">{closing.lede}</p>
         </div>
         <div class="span-2 footer__col"><h3>Clínica</h3><ul><li><a href={`${home}#sobre`}>Sobre</a></li><li><a href={`${home}#cuidados`}>Cuidados</a></li><li><a href={`${home}#head-spa`}>Head Spa</a></li></ul></div>

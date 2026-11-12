@@ -136,6 +136,8 @@ export const site = {
     src: '/img/logo-paula-moura.png',
     /** versão leve para o menu, rodapé e espaços de foto */
     small: '/img/logo-paula-moura-96.png',
+    /** menu e rodapé: nítida até 96 px em telas de alta resolução */
+    nav: '/img/logo-paula-moura-192.png',
     alt: 'Logo Dra. Paula Moura',
     note: 'Logo recebida em 1920 px (original em src/assets/logo-original.png).',
   },
