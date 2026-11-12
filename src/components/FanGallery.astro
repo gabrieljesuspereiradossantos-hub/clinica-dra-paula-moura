@@ -1,0 +1,132 @@
+---
+/**
+ * Galeria em leque (referência: "Custom Spaces" do MotionSites e "Image Fan Carousel" do 21st.dev,
+ * refeita aqui sem React). O cartão da frente fica reto e os vizinhos se abrem para os lados,
+ * girados e menores. Setas, arraste no celular, teclado (← →) e clique num cartão de lado.
+ * Sem JavaScript, vira uma fileira que rola para o lado.
+ */
+import Photo from './Photo.astro';
+import { images } from '../content/content';
+
+interface Item { slot: string; label: string }
+interface Props { items: Item[]; label: string }
+
+const { items: all, label } = Astro.props;
+const items = all.filter((it) => images[it.slot]);
+const n = items.length;
+---
+<div class="fan" data-fan aria-roledescription="carrossel" role="region" aria-label={label}>
+  <div class="fan__stage" data-fan-stage tabindex="0">
+    {items.map((it, i) => (
+      <figure class="fan__card" data-fan-card data-i={i} style={`--d: ${i}`} aria-label={`${i + 1} de ${n}: ${it.label}`} aria-hidden={i === 0 ? undefined : 'true'}>
+        <Photo slot={it.slot} class="fan__img" sizes="(min-width: 1024px) 380px, (min-width: 640px) 44vw, 68vw" />
+      </figure>
+    ))}
+  </div>
+  <div class="fan__bar">
+    <button class="fan__btn" type="button" data-fan-prev aria-label="Foto anterior">
+      <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M15 5l-7 7 7 7" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </button>
+    <p class="fan__caption" data-fan-caption aria-live="polite"><span data-fan-count>1 / {n}</span> <span data-fan-label>{items[0]?.label}</span></p>
+    <button class="fan__btn" type="button" data-fan-next aria-label="Próxima foto">
+      <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M9 5l7 7-7 7" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </button>
+  </div>
+  <script type="application/json" data-fan-labels set:html={JSON.stringify(items.map((it) => it.label))} />
+</div>
+
+<style>
+  .fan { --cw: 360px; --step: 58%; --tilt: 7deg; position: relative; }
+  /* os cartões das pontas passam da largura da tela: corta só na horizontal, sem criar rolagem lateral */
+  :global(section:has(> .wrap > [data-fan])), :global(section:has(> .wrap [data-fan])) { overflow-x: clip; }
+  .fan__stage {
+    position: relative; height: calc(var(--cw) * 1.25 + 56px); margin-inline: auto;
+    touch-action: pan-y; outline: none; user-select: none; -webkit-user-select: none;
+  }
+  .fan__stage:focus-visible { outline: 2px solid var(--p-accent); outline-offset: 8px; border-radius: var(--r-lg); }
+  .fan__card {
+    --a: min(max(var(--d), -3), 3);              /* posição relativa ao cartão da frente, limitada */
+    --ad: max(var(--a), calc(var(--a) * -1));    /* valor absoluto */
+    position: absolute; left: 50%; top: 24px; margin: 0;
+    width: var(--cw); aspect-ratio: 4 / 5; margin-left: calc(var(--cw) / -2);
+    border-radius: var(--r-lg); overflow: hidden; background: var(--p-surface);
+    box-shadow: 0 24px 60px -24px rgb(43 33 26 / 0.45);
+    transform: translateX(calc(var(--a) * var(--step))) translateY(calc(var(--ad) * 14px))
+               rotate(calc(var(--a) * var(--tilt))) scale(calc(1 - var(--ad) * 0.08));
+    transform-origin: 50% 110%;
+    z-index: calc(10 - var(--ad));
+    opacity: calc(1.6 - var(--ad) * 0.45);
+    transition: transform 620ms cubic-bezier(.2, .8, .2, 1), opacity 420ms ease, filter 420ms ease;
+    cursor: pointer;
+  }
+  .fan__card[data-front] { cursor: default; }
+  .fan__card:not([data-front]) { filter: saturate(0.85) brightness(0.92); }
+  .fan__card :global(picture), .fan__card :global(img), .fan__card :global(.fan__img) { display: block; width: 100%; height: 100%; }
+  .fan__card :global(img) { object-fit: cover; pointer-events: none; -webkit-user-drag: none; }
+
+  .fan__bar { display: flex; align-items: center; justify-content: center; gap: var(--s-4); margin-top: var(--s-5); }
+  .fan__caption { margin: 0; min-width: 0; min-height: 2.9em; display: flex; flex-wrap: wrap; align-items: center; justify-content: center; text-align: center; color: var(--p-muted); font-size: var(--t-small); }
+  .fan__caption [data-fan-count] { color: var(--p-ink); font-variant-numeric: tabular-nums; margin-right: var(--s-2); }
+  .fan__btn {
+    display: inline-grid; place-items: center; width: 48px; height: 48px; flex: none; border-radius: 50%;
+    border: 1px solid var(--p-line, rgb(43 33 26 / 0.16)); background: var(--p-bg); color: var(--p-ink); cursor: pointer;
+    transition: background-color 200ms ease, transform 200ms ease;
+  }
+  .fan__btn:hover { background: var(--p-surface); }
+  .fan__btn:active { transform: scale(0.96); }
+  .fan__btn:focus-visible { outline: 2px solid var(--p-accent); outline-offset: 3px; }
+
+  @media (max-width: 1023px) { .fan { --cw: min(44vw, 340px); --step: 52%; } }
+  @media (max-width: 639px) { .fan { --cw: 64vw; --step: 38%; --tilt: 6deg; } .fan__stage { height: calc(var(--cw) * 1.25 + 40px); } .fan__card { top: 16px; } }
+  @media (prefers-reduced-motion: reduce) { .fan__card { transition: opacity 200ms ease; } }
+
+  /* sem JavaScript: uma fileira que rola para o lado */
+  :global(html:not(.mo-js)) .fan__stage { display: flex; gap: var(--s-4); height: auto; overflow-x: auto; scroll-snap-type: x mandatory; padding-bottom: var(--s-3); }
+  :global(html:not(.mo-js)) .fan__card { position: static; flex: none; margin: 0; transform: none; opacity: 1; filter: none; scroll-snap-align: center; }
+  :global(html:not(.mo-js)) .fan__bar { display: none; }
+</style>
+
+<script>
+  for (const root of document.querySelectorAll<HTMLElement>('[data-fan]')) {
+    const stage = root.querySelector<HTMLElement>('[data-fan-stage]')!;
+    const cards = [...root.querySelectorAll<HTMLElement>('[data-fan-card]')];
+    const labels: string[] = JSON.parse(root.querySelector('[data-fan-labels]')?.textContent || '[]');
+    const count = root.querySelector('[data-fan-count]')!;
+    const label = root.querySelector('[data-fan-label]')!;
+    const n = cards.length;
+    let cur = 0;
+    // distância circular, para o leque continuar dos dois lados
+    const rel = (i: number) => { let d = (i - cur) % n; if (d > n / 2) d -= n; if (d < -n / 2) d += n; return d; };
+    const paint = () => {
+      cards.forEach((c, i) => {
+        const d = rel(i);
+        c.style.setProperty('--d', String(d));
+        c.toggleAttribute('data-front', d === 0);
+        if (d === 0) c.removeAttribute('aria-hidden'); else c.setAttribute('aria-hidden', 'true');
+      });
+      count.textContent = `${cur + 1} / ${n}`;
+      label.textContent = labels[cur] || '';
+    };
+    const go = (to: number) => { cur = ((to % n) + n) % n; paint(); };
+    root.querySelector('[data-fan-prev]')?.addEventListener('click', () => go(cur - 1));
+    root.querySelector('[data-fan-next]')?.addEventListener('click', () => go(cur + 1));
+    cards.forEach((c, i) => c.addEventListener('click', () => { if (!moved && i !== cur) go(i); }));
+    stage.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowLeft') { e.preventDefault(); go(cur - 1); }
+      if (e.key === 'ArrowRight') { e.preventDefault(); go(cur + 1); }
+    });
+    // arraste (dedo ou mouse): 40 px para o lado troca a foto; rolar a página na vertical continua livre
+    let x0 = 0, y0 = 0, down = false, moved = false;
+    stage.addEventListener('pointerdown', (e) => { down = true; moved = false; x0 = e.clientX; y0 = e.clientY; });
+    stage.addEventListener('pointermove', (e) => { if (down && Math.abs(e.clientX - x0) > 8) moved = true; });
+    const end = (e: PointerEvent) => {
+      if (!down) return; down = false;
+      const dx = e.clientX - x0, dy = e.clientY - y0;
+      if (Math.abs(dx) > 40 && Math.abs(dx) > Math.abs(dy)) go(cur + (dx < 0 ? 1 : -1));
+      setTimeout(() => { moved = false; }, 0);
+    };
+    stage.addEventListener('pointerup', end);
+    stage.addEventListener('pointercancel', () => { down = false; });
+    paint();
+  }
+</script>

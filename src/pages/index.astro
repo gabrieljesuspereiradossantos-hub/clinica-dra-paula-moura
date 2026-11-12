@@ -5,15 +5,15 @@ import Pending from '../components/Pending.astro';
 import Icon from '../components/Icon.astro';
 import ContactForm from '../components/ContactForm.astro';
 import ScrollExpandMedia from '../components/ScrollExpandMedia.astro';
+import FanGallery from '../components/FanGallery.astro';
 import { site, links, shows, flags, reviewMode } from '../config/site';
 import { hero, about, services, statement, space, steps, testimonials, faq, contact, headSpa, video, images, results, videoMoment } from '../content/content';
 
 const a = site.address;
 const headSpaWhatsapp = `https://wa.me/${site.contact.whatsapp.number}?text=${encodeURIComponent(headSpa.whatsappMessage)}`;
 /* A seção "O espaço" só aparece na versão pública quando houver pelo menos uma foto do espaço. */
-const spacePhotos = ['space1', 'space2', 'space3'].filter((k) => images[k]?.file);
-const showSpace = reviewMode || spacePhotos.length > 0;
-const spaceSlots = reviewMode ? ['space1', 'space2', 'space3'] : spacePhotos;
+const spaceGallery = space.gallery.filter((g) => reviewMode || images[g.slot]?.file);
+const showSpace = spaceGallery.length > 0;
 const resultCases = results.cases.filter((c) => images[c.slot]?.file);
 const resultSlots = resultCases.map((c) => c.slot);
 const namesMissing = resultCases.some((c) => !c.procedure);
@@ -237,9 +237,7 @@ const schema = {
       <div class="section-head">
         <h2 id="clinica-h">{space.title} <span class="muted">{space.titleMuted}</span></h2>
       </div>
-      <div class={`trio trio--${spaceSlots.length}`}>
-        {spaceSlots.map((k, i) => <div class="frame frame--photo"><Photo slot={k} sizes={i === 0 ? "(min-width: 1024px) 410px, 100vw" : "(min-width: 1024px) 410px, (min-width: 640px) 33vw, 50vw"} /></div>)}
-      </div>
+      <FanGallery items={spaceGallery} label="Fotos da clínica" />
     </div>
   </section>
   )}

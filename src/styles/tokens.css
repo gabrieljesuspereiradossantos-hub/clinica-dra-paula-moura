@@ -161,6 +161,11 @@
 @media (max-width: 1023px) {
   main > :is(section, .section):not(.hero, .section--hero, .sxm), footer.closing { min-height: 0; height: auto; }
 }
+/* desktop: a galeria em leque da clínica passa um pouco de uma tela em monitores baixos; a seção cresce
+   o necessário (pelo menos uma tela) em vez de cortar as setas */
+@media (min-width: 1024px) {
+  main > #clinica.section { height: auto; min-height: 100vh; min-height: 100svh; }
+}
 @media (max-width: 639px) {
   :where(main > :is(section, .section):not(.hero, .section--hero, .sxm):has(> :is(.wrap, .container)), footer.closing) { grid-template-rows: auto; }
   main > :is(section, .section).g2m > :is(.wrap, .container), footer.closing.g2m > .wrap { grid-template-rows: auto auto; row-gap: var(--s-8); }

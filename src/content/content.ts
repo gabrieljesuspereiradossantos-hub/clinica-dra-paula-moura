@@ -83,8 +83,20 @@ export const images: Record<string, ImageSlot> = {
     brief: 'Espaço de espera ou bem-estar',
     position: '50% 50%',
   },
-  /* Também em src/assets/fotos, ainda sem uso: clinica-parede-verde.jpg, clinica-prateleiras.jpg,
-     atendimento-aplicacao.jpg, atendimento-procedimento.jpg (pacientes com autorização). */
+  spaceRecepcao: {
+    file: 'clinica-recepcao.jpg',
+    alt: 'Recepção da clínica com balcão de mármore, monograma PM dourado, luminária de globos e o letreiro Dra. Paula Moura',
+    brief: 'Recepção',
+    position: '50% 50%',
+  },
+  spaceAtendimento: {
+    file: 'atendimento-aplicacao.jpg',
+    alt: 'Atendimento na clínica: profissional de luvas fazendo uma aplicação no rosto de um paciente',
+    brief: 'Um atendimento (paciente com autorização)',
+    position: '50% 40%',
+  },
+  /* Também em src/assets/fotos, ainda sem uso: clinica-prateleiras.jpg,
+     atendimento-procedimento.jpg (paciente com autorização). */
   result1: {
     file: 'resultado-perfil.jpg',
     alt: 'Antes e depois de uma paciente, rosto de perfil: à esquerda antes, à direita depois',
@@ -210,6 +222,15 @@ export const statement = {
 export const space = {
   title: 'A clínica na Assunção.',
   titleMuted: `Produtos, sala de procedimentos e cantinho do café no ${site.address.complement} da ${site.address.street.replace(/, \d+$/, '')}.`,
+  /** Galeria em leque da seção (ordem = ordem dos cartões). Só fotos reais da clínica. */
+  gallery: [
+    { slot: 'spaceRecepcao', label: 'Recepção' },
+    { slot: 'greenWall', label: 'Parede verde' },
+    { slot: 'space2', label: 'Sala de procedimentos' },
+    { slot: 'space1', label: 'Prateleira de produtos' },
+    { slot: 'space3', label: 'Cantinho do café' },
+    { slot: 'spaceAtendimento', label: 'Um atendimento' },
+  ],
 };
 
 /* --------------------------------------------------------------- como funciona */
