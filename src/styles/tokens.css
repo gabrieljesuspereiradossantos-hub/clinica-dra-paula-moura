@@ -164,8 +164,11 @@
 /* desktop: a galeria em leque da clínica passa um pouco de uma tela em monitores baixos; a seção cresce
    o necessário (pelo menos uma tela) em vez de cortar as setas */
 @media (min-width: 1024px) {
-  main > :is(#clinica, #resultados, #head-spa).section { height: auto; min-height: 100vh; min-height: 100svh; }
+  main > :is(#clinica, #resultados, #head-spa, #cuidados).section { height: auto; min-height: 100vh; min-height: 100svh; }
 }
+/* a faixa dos equipamentos (Cuidados) não encolhe para caber na tela: em monitores baixos ela ficava com
+   127 px e cortava as máquinas */
+#cuidados .frame--band { flex: none; }
 @media (max-width: 639px) {
   :where(main > :is(section, .section):not(.hero, .section--hero, .sxm):has(> :is(.wrap, .container)), footer.closing) { grid-template-rows: auto; }
   main > :is(section, .section).g2m > :is(.wrap, .container), footer.closing.g2m > .wrap { grid-template-rows: auto auto; row-gap: var(--s-8); }
