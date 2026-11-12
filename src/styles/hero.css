@@ -54,6 +54,21 @@ main > .hero.hero--clinic {
 .hc-badge__score { font-weight: 500; }
 .hc-stars { color: var(--hc-gold); letter-spacing: 1px; margin-left: 2px; }
 .hc-badge__meta { color: var(--p-inv-muted); }
+/* o selo é um link: "Ver ↗" deixa claro que abre as avaliações no Google */
+.hc-badge { transition: background-color 220ms ease, border-color 220ms ease; }
+.hc-badge__go { display: inline-flex; align-items: center; gap: 4px; padding-left: var(--s-3); border-left: 1px solid rgb(255 255 255 / 0.18); color: var(--hc-gold); font-weight: 500; }
+.hc-badge__go svg { width: 12px; height: 12px; transition: transform 220ms ease; }
+@media (hover: hover) {
+  .hc-badge:hover { background: rgb(255 255 255 / 0.14); border-color: rgb(255 255 255 / 0.32); }
+  .hc-badge:hover .hc-badge__go svg { transform: translate(2px, -2px); }
+}
+.hc-badge:focus-visible { outline: 2px solid var(--hc-gold); outline-offset: 3px; }
+
+/* movimento da foto da recepção: aproximação lenta e contínua (scale) e leve deslocamento com a rolagem
+   (translate, via --hc-py do script da página). Propriedades separadas para não brigar com a entrada. */
+.hc-media > picture { top: -6%; bottom: -6%; height: auto; animation: hc-drift 28s ease-in-out infinite alternate; transform-origin: 62% 45%; translate: 0 var(--hc-py, 0px); will-change: scale, translate; }
+@keyframes hc-drift { from { scale: 1; } to { scale: 1.07; } }
+@media (prefers-reduced-motion: reduce) { .hc-media > picture { animation: none; translate: none; } }
 
 /* título: três linhas fixas, a do meio em itálico dourado */
 .hc-title {

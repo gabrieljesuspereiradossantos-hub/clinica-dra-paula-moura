@@ -164,7 +164,7 @@
 /* desktop: a galeria em leque da clínica passa um pouco de uma tela em monitores baixos; a seção cresce
    o necessário (pelo menos uma tela) em vez de cortar as setas */
 @media (min-width: 1024px) {
-  main > #clinica.section { height: auto; min-height: 100vh; min-height: 100svh; }
+  main > :is(#clinica, #resultados, #head-spa).section { height: auto; min-height: 100vh; min-height: 100svh; }
 }
 @media (max-width: 639px) {
   :where(main > :is(section, .section):not(.hero, .section--hero, .sxm):has(> :is(.wrap, .container)), footer.closing) { grid-template-rows: auto; }
@@ -207,3 +207,23 @@
   #clinica .trio .frame { --ratio: 120%; }
   #clinica .trio .frame:first-child { --ratio: 62%; }
 }
+
+/* ---------- Head Spa: escolha do pacote (rádios com cara de linha da tabela) */
+.hs-pick { border: 0; margin: 0; padding: 0; min-width: 0; display: grid; gap: var(--s-3); }
+.hs-opt {
+  position: relative; display: grid; grid-template-columns: 22px minmax(0, 1fr) auto; column-gap: var(--s-4); row-gap: var(--s-1);
+  padding: var(--s-4) var(--s-4); border: 1px solid var(--line); border-radius: var(--r-lg); background: var(--p-bg);
+  cursor: pointer; transition: border-color 200ms ease, background-color 200ms ease, box-shadow 200ms ease, transform 160ms ease;
+}
+.hs-opt .rows__name { grid-column: 2; font-weight: 500; }
+.hs-opt .rows__value { grid-column: 3; grid-row: 1; text-align: right; white-space: nowrap; font-variant-numeric: tabular-nums; }
+.hs-opt__text { grid-column: 2 / -1; color: var(--ink); font-size: var(--t-small); max-width: 56ch; }
+.hs-opt__check { grid-column: 1; grid-row: 1; align-self: center; width: 20px; height: 20px; border-radius: 50%; border: 1.5px solid var(--p-muted); transition: border-color 200ms ease, box-shadow 200ms ease; }
+@media (hover: hover) { .hs-opt:hover { border-color: color-mix(in oklab, var(--p-accent) 45%, var(--line)); } }
+.hs-opt:active { transform: scale(0.99); }
+.hs-opt:has(input:checked) { border-color: var(--p-accent); background: color-mix(in oklab, var(--p-accent) 7%, var(--p-bg)); box-shadow: 0 10px 30px -18px rgb(43 33 26 / 0.45); }
+.hs-opt:has(input:checked) .hs-opt__check { border-color: var(--p-accent); box-shadow: inset 0 0 0 5px var(--p-accent); }
+.hs-opt:has(input:focus-visible) { outline: 2px solid var(--p-accent); outline-offset: 3px; }
+.hs-cta { display: flex; flex-wrap: wrap; align-items: center; gap: var(--s-3) var(--s-5); }
+.hs-cta p { margin: 0; }
+@media (prefers-reduced-motion: reduce) { .hs-opt { transition: none; } }

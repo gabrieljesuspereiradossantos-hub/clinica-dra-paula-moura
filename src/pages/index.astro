@@ -6,6 +6,7 @@ import Icon from '../components/Icon.astro';
 import ContactForm from '../components/ContactForm.astro';
 import ScrollExpandMedia from '../components/ScrollExpandMedia.astro';
 import FanGallery from '../components/FanGallery.astro';
+import BeforeAfter from '../components/BeforeAfter.astro';
 import { site, links, shows, flags, reviewMode } from '../config/site';
 import { hero, about, services, statement, space, steps, testimonials, faq, contact, headSpa, video, images, results, videoMoment } from '../content/content';
 
@@ -60,10 +61,11 @@ const schema = {
       <div class="wrap hc-content">
         <div class="hero-text hc-text">
           {site.rating.show && (
-            <a class="hc-badge hc-enter" style="--i: 0" href={links.reviews} target="_blank" rel="noopener">
+            <a class="hc-badge hc-enter" style="--i: 0" href={links.reviews} target="_blank" rel="noopener" aria-label={`Nota ${site.rating.value} de 5 com ${site.rating.count} avaliações no ${site.rating.source}: ler as avaliações (abre em nova aba)`}>
               <img src={site.logo.small} alt="" width="32" height="32" />
               <span class="hc-badge__score">{site.rating.value} <span class="hc-stars" aria-hidden="true">★★★★★</span></span>
               <span class="hc-badge__meta">{site.rating.count} avaliações no {site.rating.source}</span>
+              <span class="hc-badge__go" aria-hidden="true">Ver<svg viewBox="0 0 12 12"><path d="M3.5 8.5l5-5M4.5 3.5h4v4" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
             </a>
           )}
           <h1 id="hero-h" class="hc-title hc-enter" style="--i: 1">
@@ -140,13 +142,26 @@ const schema = {
           <h2 id="headspa-h">{headSpa.title} <span class="muted">{headSpa.titleMuted}</span></h2>
           {reviewMode && !headSpa.pricesConfirmed && <p class="review-note"><Pending note="conferir se os valores dos posts continuam valendo" /></p>}
         </div>
-        <ul class="rows">
-          {headSpa.packages.map((p) => (
-            <li><span class="rows__name">{p.name}<small class="rows__meta">{p.duration}</small></span><span class="rows__value">{p.price}</span><p>{p.includes}</p></li>
+        <!-- escolha do pacote: o botão abre o WhatsApp com o pacote escolhido já na mensagem -->
+        <fieldset class="hs-pick" data-hs>
+          <legend class="sr-only">Escolha um pacote de Head Spa</legend>
+          {headSpa.packages.map((p, i) => (
+            <label class="hs-opt">
+              <input class="sr-only" type="radio" name="hs-pacote" value={String(i)}
+                data-short={p.name.replace(/^Head Spa /, '')}
+                data-href={`https://wa.me/${site.contact.whatsapp.number}?text=${encodeURIComponent(headSpa.packageMessage(p))}`} />
+              <span class="hs-opt__check" aria-hidden="true"></span>
+              <span class="rows__name">{p.name}<small class="rows__meta">{p.duration}</small></span>
+              <span class="rows__value">{p.price}</span>
+              <span class="hs-opt__text">{p.includes}</span>
+            </label>
           ))}
-        </ul>
+        </fieldset>
         <p class="t-small muted">{headSpa.finish}</p>
-        <a class="link" href={headSpaWhatsapp} target="_blank" rel="noopener">Reservar o Head Spa pelo WhatsApp</a>
+        <div class="hs-cta">
+          <a class="btn btn--primary" data-hs-cta href={headSpaWhatsapp} target="_blank" rel="noopener"><span data-hs-label>Reservar o Head Spa pelo WhatsApp</span></a>
+          <p class="t-small muted" data-hs-hint>Escolha um pacote para ele já ir na mensagem.</p>
+        </div>
       </div>
       <div class="span-6 start-7 col-fill">
         <div class="frame frame--photo frame--fit"><Photo slot="headspa" sizes="(min-width: 1024px) 628px, 100vw" /></div>
@@ -202,7 +217,7 @@ const schema = {
       <div class="trio trio--results">
         {resultCases.map((c) => (
           <div class="ba-case">
-            <div class="frame frame--photo"><Photo slot={c.slot} sizes="(min-width: 1024px) 410px, 100vw" /></div>
+            <BeforeAfter slot={c.slot} procedure={c.procedure} y={c.y} />
             {c.procedure && <p class="ba-case__name">{c.procedure}</p>}
           </div>
         ))}
@@ -273,4 +288,34 @@ const schema = {
     </div>
   </section>
 
+  <script>
+    // hero: a foto da recepção desce mais devagar que a página (parallax leve, até 6% da altura do quadro)
+    const media = document.querySelector<HTMLElement>('.hc-media');
+    if (media && !matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      let raf = 0;
+      const paint = () => {
+        raf = 0;
+        const h = media.offsetHeight;
+        if (scrollY > h * 1.2) return;
+        media.style.setProperty('--hc-py', `${Math.min(scrollY * 0.12, h * 0.06).toFixed(1)}px`);
+      };
+      addEventListener('scroll', () => { if (!raf) raf = requestAnimationFrame(paint); }, { passive: true });
+      paint();
+    }
+
+    // Head Spa: o pacote escolhido vai para o link e o texto do botão
+    const hs = document.querySelector<HTMLElement>('[data-hs]');
+    const cta = document.querySelector<HTMLAnchorElement>('[data-hs-cta]');
+    if (hs && cta) {
+      const label = cta.querySelector('[data-hs-label]');
+      const hint = document.querySelector<HTMLElement>('[data-hs-hint]');
+      hs.addEventListener('change', (e) => {
+        const input = e.target as HTMLInputElement;
+        if (!input.matches('input[type="radio"]')) return;
+        cta.href = input.dataset.href || cta.href;
+        if (label) label.textContent = `Reservar o ${input.dataset.short} pelo WhatsApp`;
+        if (hint) hint.hidden = true;
+      });
+    }
+  </script>
 </Base>

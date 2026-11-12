@@ -1,0 +1,86 @@
+---
+/**
+ * Antes e depois arrastável (referência: "Image Compare" do 21st.dev, refeito sem React).
+ * As fotos autorizadas vêm com o antes e o depois lado a lado num só arquivo, divididos ao meio:
+ * a mesma imagem aparece duas vezes, uma mostrando a metade esquerda (antes) e outra a direita (depois).
+ * Arraste (dedo ou mouse), toque num ponto ou use as setas do teclado no controle deslizante.
+ * Nenhuma foto é retocada nem realinhada.
+ */
+import Photo from './Photo.astro';
+
+interface Props { slot: string; procedure?: string; y?: string }
+const { slot, procedure, y = '50%' } = Astro.props;
+const name = procedure || 'caso';
+---
+<div class="ba" data-ba style={`--pos: 50%; --y: ${y}`}>
+  <div class="ba__layer ba__after" aria-hidden="true"><Photo slot={slot} class="ba__img" sizes="(min-width: 1024px) 820px, 200vw" /></div>
+  <div class="ba__layer ba__before"><Photo slot={slot} class="ba__img" sizes="(min-width: 1024px) 820px, 200vw" /></div>
+  <span class="ba__tag ba__tag--l" aria-hidden="true">Antes</span>
+  <span class="ba__tag ba__tag--r" aria-hidden="true">Depois</span>
+  <span class="ba__handle" aria-hidden="true"><span class="ba__knob"><svg viewBox="0 0 24 24" width="18" height="18"><path d="M9 6l-5 6 5 6M15 6l5 6-5 6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span></span>
+  <input class="ba__range" type="range" min="0" max="100" value="50" step="1" aria-label={`Comparar antes e depois: ${name}`} aria-valuetext="metade antes, metade depois" />
+</div>
+
+<style>
+  .ba { position: relative; aspect-ratio: 4 / 5; border-radius: var(--r-lg); overflow: hidden; background: var(--p-surface); touch-action: pan-y; cursor: ew-resize; user-select: none; -webkit-user-select: none; isolation: isolate; }
+  .ba__layer { position: absolute; inset: 0; overflow: hidden; }
+  .ba__before { clip-path: inset(0 calc(100% - var(--pos)) 0 0); z-index: 1; }
+  .ba__layer :global(.ba__img) { position: absolute; inset: 0; display: block; }
+  /* a imagem tem o dobro da largura do quadro: metade esquerda = antes, metade direita = depois */
+  .ba__layer :global(img) { position: absolute; top: 0; left: 0; width: 200%; max-width: none; height: 100%; object-fit: cover; object-position: 50% var(--y); pointer-events: none; -webkit-user-drag: none; }
+  .ba__after :global(img) { left: -100%; }
+  .ba__handle { position: absolute; top: 0; bottom: 0; left: var(--pos); z-index: 2; width: 2px; margin-left: -1px; background: rgb(255 255 255 / 0.9); box-shadow: 0 0 0 1px rgb(43 33 26 / 0.12); pointer-events: none; }
+  .ba__knob { position: absolute; top: 50%; left: 50%; display: grid; place-items: center; width: 44px; height: 44px; margin: -22px 0 0 -22px; border-radius: 50%; background: rgb(255 255 255 / 0.95); color: var(--p-ink); box-shadow: 0 8px 24px -8px rgb(43 33 26 / 0.45); transition: transform 180ms ease; }
+  .ba.is-dragging .ba__knob { transform: scale(1.08); }
+  .ba__tag { position: absolute; top: var(--s-3); z-index: 3; padding: 4px 10px; border-radius: 999px; background: rgb(43 33 26 / 0.62); color: #fff; font-size: var(--t-small); line-height: 1.3; pointer-events: none; }
+  .ba__tag--l { left: var(--s-3); }
+  .ba__tag--r { right: var(--s-3); }
+  /* o controle de verdade (teclado e leitor de tela) fica invisível por cima */
+  .ba__range { position: absolute; inset: 0; z-index: 4; width: 100%; height: 100%; margin: 0; opacity: 0; cursor: ew-resize; pointer-events: none; }
+  .ba:has(.ba__range:focus-visible) { outline: 2px solid var(--p-accent); outline-offset: 3px; }
+  /* aceno ao aparecer, para mostrar que dá para arrastar */
+  .ba.is-hint .ba__before, .ba.is-hint .ba__handle { transition: clip-path 700ms cubic-bezier(.4, 0, .2, 1), left 700ms cubic-bezier(.4, 0, .2, 1); }
+  @media (prefers-reduced-motion: reduce) { .ba.is-hint .ba__before, .ba.is-hint .ba__handle { transition: none; } }
+</style>
+
+<script>
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  for (const el of document.querySelectorAll<HTMLElement>('[data-ba]')) {
+    const range = el.querySelector<HTMLInputElement>('.ba__range')!;
+    const set = (p: number) => {
+      const v = Math.max(0, Math.min(100, p));
+      el.style.setProperty('--pos', `${v}%`);
+      range.value = String(Math.round(v));
+      range.setAttribute('aria-valuetext', `${Math.round(v)}% antes, ${100 - Math.round(v)}% depois`);
+    };
+    const at = (x: number) => { const r = el.getBoundingClientRect(); return ((x - r.left) / r.width) * 100; };
+    range.addEventListener('input', () => set(Number(range.value)));
+    // arraste: só na horizontal; rolar a página na vertical continua livre (touch-action: pan-y)
+    let id = -1, x0 = 0, y0 = 0, horiz = false;
+    el.addEventListener('pointerdown', (e) => { id = e.pointerId; x0 = e.clientX; y0 = e.clientY; horiz = e.pointerType === 'mouse'; if (horiz) { el.classList.add('is-dragging'); set(at(e.clientX)); } });
+    el.addEventListener('pointermove', (e) => {
+      if (e.pointerId !== id) return;
+      if (!horiz && Math.abs(e.clientX - x0) > 6 && Math.abs(e.clientX - x0) > Math.abs(e.clientY - y0)) { horiz = true; el.classList.add('is-dragging'); try { el.setPointerCapture(id); } catch {} }
+      if (horiz) set(at(e.clientX));
+    });
+    const end = (e: PointerEvent) => {
+      if (e.pointerId !== id) return;
+      // um toque rápido sem arrastar também posiciona o divisor
+      if (!horiz && Math.abs(e.clientX - x0) < 6 && Math.abs(e.clientY - y0) < 6 && e.type === 'pointerup') set(at(e.clientX));
+      id = -1; horiz = false; el.classList.remove('is-dragging');
+    };
+    el.addEventListener('pointerup', end);
+    el.addEventListener('pointercancel', end);
+    if (!reduce && 'IntersectionObserver' in window) {
+      const io = new IntersectionObserver((es) => {
+        if (!es.some((x) => x.isIntersecting)) return;
+        io.disconnect();
+        el.classList.add('is-hint');
+        setTimeout(() => set(32), 250);
+        setTimeout(() => set(50), 1000);
+        setTimeout(() => el.classList.remove('is-hint'), 1750);
+      }, { threshold: 0.6 });
+      io.observe(el);
+    }
+  }
+</script>

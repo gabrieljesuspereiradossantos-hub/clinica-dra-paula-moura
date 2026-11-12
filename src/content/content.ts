@@ -170,6 +170,9 @@ export const headSpa = {
   finish: 'Todos terminam com leve secagem dos fios e uma bebida especial.',
   pricesConfirmed: true,
   whatsappMessage: 'Olá! Vim pelo site e gostaria de agendar o Head Spa.',
+  /** mensagem quando a pessoa escolhe um pacote no site */
+  packageMessage: (p: { name: string; duration: string; price: string }) =>
+    `Olá! Vim pelo site e gostaria de agendar o ${p.name} (${p.duration}, ${p.price}).`,
   packages: [
     { name: 'Head Spa Soft Relax', duration: '45 minutos', price: 'R$ 180', includes: 'Massagem capilar relaxante, lavagem completa dos fios e massagem no pescoço e ombros.' },
     { name: 'Head Spa Therapy', duration: '1h30', price: 'R$ 250', includes: 'O Soft Relax com massagem nas costas.' },
@@ -182,14 +185,15 @@ export const headSpa = {
  * Sem promessa de resultado: o texto deixa claro que cada caso é avaliado. */
 export const results = {
   title: 'Resultados de pacientes.',
-  titleMuted: 'Antes à esquerda, depois à direita.',
-  note: 'Fotos publicadas com autorização dos pacientes. Cada resultado depende da avaliação, do protocolo indicado e da resposta de cada pessoa.',
-  /** procedure: nome do procedimento de cada caso (aparece abaixo da foto). Vazio = não mostra. */
+  titleMuted: 'Arraste o divisor para comparar o antes e o depois.',
+  note: 'Fotos publicadas com autorização dos pacientes, sem retoque. Cada resultado depende da avaliação, do protocolo indicado e da resposta de cada pessoa.',
+  /** procedure: nome do procedimento de cada caso (aparece abaixo da foto). Vazio = não mostra.
+   *  y: altura do recorte vertical da foto no quadro (o rosto fica centralizado). */
   cases: [
-    { slot: 'result1', procedure: 'Rinomodelação' },
-    { slot: 'result2', procedure: 'Preenchimento labial' },
-    { slot: 'result3', procedure: 'Harmonização facial detalhada' },
-  ],
+    { slot: 'result1', procedure: 'Rinomodelação', y: '55%' },
+    { slot: 'result2', procedure: 'Preenchimento labial', y: '58%' },
+    { slot: 'result3', procedure: 'Harmonização facial detalhada', y: '45%' },
+  ] as { slot: string; procedure: string; y?: string }[],
 };
 
 /* --------------------------------------------------------------- vídeo
