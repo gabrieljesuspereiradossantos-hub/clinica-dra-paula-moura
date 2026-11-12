@@ -100,11 +100,6 @@ export const images: Record<string, ImageSlot> = {
     alt: 'Antes e depois de um paciente, rosto de frente: à esquerda antes, à direita depois',
     brief: 'Antes e depois autorizado',
   },
-  consult: {
-    file: '',
-    alt: 'Dra. Paula Moura explicando um protocolo para uma paciente',
-    brief: 'Momento de conversa e avaliação, paciente de costas ou com autorização',
-  },
 };
 
 /* --------------------------------------------------------------- hero */

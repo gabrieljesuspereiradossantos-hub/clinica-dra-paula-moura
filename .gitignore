@@ -7,3 +7,6 @@ shots/
 .playwright-mcp/
 .vercel/
 .env*
+video/node_modules/
+video/capture/
+video/**/renders/

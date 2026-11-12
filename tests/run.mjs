@@ -64,6 +64,11 @@ const pub = build(false, 'dist-public');
 common(pub, 'Versão pública (dist-public/)');
 ok(!pub.includes('A confirmar'), 'sem etiquetas "A confirmar"');
 ok(!pub.includes('Foto a enviar'), 'sem rótulos de foto pendente');
+// nenhuma chave repetida no mapa de imagens (a última sobrescreve a primeira sem aviso)
+const imagesBlock = readFileSync(join(root, 'src/content/content.ts'), 'utf8').split('export const images')[1].split('\n};')[0];
+const keys = [...imagesBlock.matchAll(/^  (\w+): \{/gm)].map((m) => m[1]);
+ok(keys.length === new Set(keys).size, 'sem espaços de foto duplicados (' + keys.filter((k, i) => keys.indexOf(k) !== i).join(', ') + ')');
+ok(!/class="[^"]*\bslot\b/.test(pub), 'versão pública sem espaços de foto vazios');
 ok(!pub.includes('1.000 atendimentos'), 'não publica "1.000 atendimentos" sem confirmação');
 ok(!pub.includes('Estados Unidos'), 'não publica atuação internacional sem confirmação');
 ok(!pub.includes('noindex'), 'indexável');
